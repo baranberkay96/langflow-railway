@@ -1,5 +1,7 @@
 # Deploy and Host Langflow with Railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/langflow-v1-ai-agent-builder)
+
 Langflow is an open-source visual builder for AI agents, RAG pipelines and MCP servers. You connect components on a canvas, test them in a playground and serve every flow as an API or MCP tool. This community template runs a pinned Langflow release with Postgres, Redis and persistent storage.
 
 ## About Hosting Langflow
