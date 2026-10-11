@@ -51,7 +51,7 @@ Langflow is a Python application that serves its editor, REST API and MCP endpoi
 
 **Custom domain:** add it to the Langflow service, then update `LANGFLOW_CORS_ORIGINS` and `LANGFLOW_MCP_BASE_URL` to the new origin.
 
-**Pinning and upgrading:** the image is pinned to `1.12.5`. To upgrade, back up Postgres, change the tag on the Langflow service and redeploy; Langflow migrates the database on start. Do not roll back to an older version against a migrated database without restoring the backup. To change the component inventory, switch between `langflowai/langflow:base-<ver>`, `langflowai/langflow:<ver>` and `langflowai/langflow-all:<ver>`.
+**Pinning and upgrading:** the image is pinned to `1.12.5`. To upgrade, back up Postgres, change the tag on the Langflow service and redeploy; Langflow migrates the database on start. Do not roll back to an older version against a migrated database without restoring the backup. To change the component inventory, switch between `langflowai/langflow:base-{ver}`, `langflowai/langflow:{ver}` and `langflowai/langflow-all:{ver}`.
 
 ### Why Deploy Langflow on Railway?
 
