@@ -1,0 +1,308 @@
+{
+  "name": "Langflow v1 AI Agent Builder",
+  "description": "Build agents, RAG pipelines and MCP servers visually. Postgres-backed, persistent.",
+  "category": "AI/ML",
+  "tags": [
+    "langflow",
+    "agents",
+    "rag",
+    "mcp",
+    "llm",
+    "low-code",
+    "ai"
+  ],
+  "upstream": {
+    "repo": "langflow-ai/langflow",
+    "version": "v1.12.5",
+    "checked": "2026-10-10"
+  },
+  "services": {
+    "Langflow": {
+      "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/langflow.png",
+      "source": {
+        "image": "langflowai/langflow:1.12.5"
+      },
+      "startCommand": null,
+      "preDeployCommand": null,
+      "healthcheckPath": "/health_check",
+      "healthcheckTimeout": 600,
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10,
+      "numReplicas": 1,
+      "cronSchedule": null,
+      "publicDomain": true,
+      "targetPort": 7860,
+      "tcpProxy": null,
+      "volume": {
+        "mountPath": "/app/langflow"
+      },
+      "variables": {
+        "PORT": {
+          "defaultValue": "7860",
+          "description": "Port Railway routes the public domain to.",
+          "required": false
+        },
+        "LANGFLOW_HOST": {
+          "defaultValue": "0.0.0.0",
+          "description": "Bind address (Langflow's port check only supports IPv4 literals).",
+          "required": false
+        },
+        "LANGFLOW_PORT": {
+          "defaultValue": "${{PORT}}",
+          "description": "Langflow listen port.",
+          "required": false
+        },
+        "RAILWAY_RUN_UID": {
+          "defaultValue": "0",
+          "description": "Run as root so the Railway volume (root-owned) is writable; the image user is uid 1000.",
+          "required": false
+        },
+        "LANGFLOW_CONFIG_DIR": {
+          "defaultValue": "/app/langflow",
+          "description": "Config dir on the volume: uploaded files, logs, MCP/Composer state.",
+          "required": false
+        },
+        "LANGFLOW_KNOWLEDGE_BASES_DIR": {
+          "defaultValue": "/app/langflow/knowledge_bases",
+          "description": "Knowledge bases on the volume (default ~/.langflow is outside it).",
+          "required": false
+        },
+        "LANGFLOW_FS_TOOL_BASE_DIR": {
+          "defaultValue": "/app/langflow/fs_tool",
+          "description": "File System component sandbox on the volume.",
+          "required": false
+        },
+        "LANGFLOW_DATABASE_URL": {
+          "defaultValue": "${{Postgres.DATABASE_URL}}",
+          "description": "Postgres connection (converted to the async psycopg driver by Langflow).",
+          "required": false
+        },
+        "LANGFLOW_DATABASE_CONNECTION_RETRY": {
+          "defaultValue": "true",
+          "description": "Retry the DB connection while Postgres is still starting.",
+          "required": false
+        },
+        "LANGFLOW_DB_CONNECTION_SETTINGS": {
+          "defaultValue": "{\"pool_size\": 10, \"max_overflow\": 10, \"pool_timeout\": 30, \"pool_pre_ping\": true, \"pool_recycle\": 1800, \"echo\": false}",
+          "description": "SQLAlchemy pool per worker, sized for Postgres' 100-connection limit.",
+          "required": false
+        },
+        "LANGFLOW_SECRET_KEY": {
+          "defaultValue": "${{secret(43, \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_\")}}",
+          "description": "Encryption key for stored credentials/API keys and JWT signing. Never change after first boot.",
+          "required": false
+        },
+        "LANGFLOW_AUTO_LOGIN": {
+          "defaultValue": "false",
+          "description": "Require login (multi-user mode).",
+          "required": false
+        },
+        "LANGFLOW_SUPERUSER": {
+          "defaultValue": "admin",
+          "description": "Admin username created on first boot.",
+          "required": false
+        },
+        "LANGFLOW_SUPERUSER_PASSWORD": {
+          "defaultValue": "${{secret(24, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Admin password (generated). Read it here to sign in.",
+          "required": false
+        },
+        "LANGFLOW_NEW_USER_IS_ACTIVE": {
+          "defaultValue": "false",
+          "description": "New sign-ups stay inactive until an admin activates them.",
+          "required": false
+        },
+        "LANGFLOW_WORKERS": {
+          "defaultValue": "2",
+          "description": "Gunicorn worker processes. Safe above 1 because the job queue is in Redis.",
+          "required": false
+        },
+        "LANGFLOW_WORKER_TIMEOUT": {
+          "defaultValue": "300",
+          "description": "Worker timeout in seconds.",
+          "required": false
+        },
+        "LANGFLOW_JOB_QUEUE_TYPE": {
+          "defaultValue": "redis",
+          "description": "Shared build/job queue so any worker can serve any flow run.",
+          "required": false
+        },
+        "LANGFLOW_REDIS_QUEUE_URL": {
+          "defaultValue": "redis://${{Redis.REDISUSER}}:${{Redis.REDIS_PASSWORD}}@${{Redis.REDISHOST}}:${{Redis.REDISPORT}}/1",
+          "description": "Redis URL for the job queue (DB 1, authenticated).",
+          "required": false
+        },
+        "LANGFLOW_RATE_LIMIT_STORAGE_URI": {
+          "defaultValue": "redis://${{Redis.REDISUSER}}:${{Redis.REDIS_PASSWORD}}@${{Redis.REDISHOST}}:${{Redis.REDISPORT}}/2",
+          "description": "Shared login/public-flow rate-limit counters (DB 2).",
+          "required": false
+        },
+        "LANGFLOW_RATE_LIMIT_TRUST_PROXY": {
+          "defaultValue": "true",
+          "description": "Use X-Forwarded-For from Railway's proxy so limits apply per client, not per proxy.",
+          "required": false
+        },
+        "LANGFLOW_CORS_ORIGINS": {
+          "defaultValue": "https://${{RAILWAY_PUBLIC_DOMAIN}}",
+          "description": "Allowed browser origins. Add sites that embed the Langflow chat widget (comma-separated).",
+          "required": false
+        },
+        "LANGFLOW_MCP_BASE_URL": {
+          "defaultValue": "https://${{RAILWAY_PUBLIC_DOMAIN}}",
+          "description": "Public origin used in the MCP server URLs Langflow shows for projects.",
+          "required": false
+        },
+        "LANGFLOW_LOG_LEVEL": {
+          "defaultValue": "info",
+          "description": "Log level (debug, info, warning, error).",
+          "required": false
+        },
+        "LANGFLOW_ALEMBIC_LOG_TO_STDOUT": {
+          "defaultValue": "true",
+          "description": "Show database migration logs in Railway logs.",
+          "required": false
+        },
+        "LANGFLOW_DO_NOT_TRACK": {
+          "defaultValue": "true",
+          "description": "Disable anonymous product telemetry.",
+          "required": false
+        }
+      }
+    },
+    "Postgres": {
+      "icon": "https://devicons.railway.app/i/postgresql.svg",
+      "source": {
+        "image": "ghcr.io/railwayapp-templates/postgres-ssl:18"
+      },
+      "startCommand": null,
+      "preDeployCommand": null,
+      "healthcheckPath": null,
+      "healthcheckTimeout": null,
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10,
+      "numReplicas": 1,
+      "cronSchedule": null,
+      "publicDomain": false,
+      "targetPort": null,
+      "tcpProxy": null,
+      "volume": {
+        "mountPath": "/var/lib/postgresql/data"
+      },
+      "variables": {
+        "PGDATA": {
+          "defaultValue": "/var/lib/postgresql/data/pgdata",
+          "description": "Location where the database will be initialized",
+          "required": false
+        },
+        "PGHOST": {
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "Railway Private Domain Name.",
+          "required": false
+        },
+        "PGPORT": {
+          "defaultValue": "5432",
+          "description": "Port to connect to Postgres.",
+          "required": false
+        },
+        "PGUSER": {
+          "defaultValue": "${{ POSTGRES_USER }}",
+          "description": "Required variable for Data panel",
+          "required": false
+        },
+        "PGDATABASE": {
+          "defaultValue": "${{POSTGRES_DB}}",
+          "description": "Required variable for the data panel.",
+          "required": false
+        },
+        "PGPASSWORD": {
+          "defaultValue": "${{POSTGRES_PASSWORD}}",
+          "description": "Required variable for Data panel",
+          "required": false
+        },
+        "POSTGRES_DB": {
+          "defaultValue": "railway",
+          "description": "Default database created when image is started.",
+          "required": false
+        },
+        "DATABASE_URL": {
+          "defaultValue": "postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}",
+          "description": "URL to connect to Postgres database.",
+          "required": false
+        },
+        "POSTGRES_USER": {
+          "defaultValue": "postgres",
+          "description": "User to connect to Postgres DB",
+          "required": false
+        },
+        "SSL_CERT_DAYS": {
+          "defaultValue": "820",
+          "description": "SSL certificate expiry in days.",
+          "required": false
+        },
+        "POSTGRES_PASSWORD": {
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}",
+          "description": "Password to connect to DB",
+          "required": false
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "60",
+          "description": "Allow Postgres to cleanly shut down",
+          "required": false
+        }
+      }
+    },
+    "Redis": {
+      "icon": "https://cdn.sanity.io/images/sy1jschh/production/0ce0bfdcfbdbf69662b1116671f97c2dd788b655-157x157.svg",
+      "source": {
+        "image": "redis:8.2"
+      },
+      "startCommand": "/bin/sh -c \"rm -rf $RAILWAY_VOLUME_MOUNT_PATH/lost+found/ && exec docker-entrypoint.sh redis-server --requirepass $REDIS_PASSWORD --save 60 1 --dir $RAILWAY_VOLUME_MOUNT_PATH\"",
+      "preDeployCommand": null,
+      "healthcheckPath": null,
+      "healthcheckTimeout": null,
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10,
+      "numReplicas": 1,
+      "cronSchedule": null,
+      "publicDomain": false,
+      "targetPort": null,
+      "tcpProxy": null,
+      "volume": {
+        "mountPath": "/data"
+      },
+      "variables": {
+        "REDISHOST": {
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "Private network hostname of the Redis service, only resolvable from services in the same environment",
+          "required": false
+        },
+        "REDISPORT": {
+          "defaultValue": "6379",
+          "description": "Port that Redis listens on",
+          "required": false
+        },
+        "REDISUSER": {
+          "defaultValue": "default",
+          "description": "Username for authenticating with Redis",
+          "required": false
+        },
+        "REDIS_URL": {
+          "defaultValue": "redis://${{ REDISUSER }}:${{ REDIS_PASSWORD }}@${{ REDISHOST }}:${{ REDISPORT }}",
+          "description": "Connection string for connecting to Redis using the private network",
+          "required": false
+        },
+        "REDISPASSWORD": {
+          "defaultValue": "${{REDIS_PASSWORD}}",
+          "description": "Alias of REDIS_PASSWORD for clients that expect the unseparated name",
+          "required": false
+        },
+        "REDIS_PASSWORD": {
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}",
+          "description": "Randomly generated password for authenticating with Redis",
+          "required": false
+        }
+      }
+    }
+  },
+  "buckets": []
+}
