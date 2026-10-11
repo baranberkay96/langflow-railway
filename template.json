@@ -1,6 +1,6 @@
 {
   "name": "Langflow v1 AI Agent Builder",
-  "description": "Build agents, RAG pipelines and MCP servers visually. Postgres-backed, persistent.",
+  "description": "Build agents, RAG pipelines and MCP servers visually, backed by Postgres.",
   "category": "AI/ML",
   "tags": [
     "langflow",

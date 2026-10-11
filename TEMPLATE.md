@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Name | **Langflow v1 AI Agent Builder** (version label `v1` = Langflow major version; releases are tagged `v1.x.y`) |
-| Description | Build agents, RAG pipelines and MCP servers visually. Postgres-backed, persistent. (82 chars) |
+| Description | Build agents, RAG pipelines and MCP servers visually, backed by Postgres. (82 chars) |
 | Category | AI/ML |
 | Tags | langflow, agents, rag, mcp, llm, low-code, ai |
 | User input at deploy | **None.** Admin password and secret key are generated. |
